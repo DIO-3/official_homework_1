@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Students</title>
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <nav>
+        <a href="index.html">Students</a> | <a href="courses.html">Courses</a>
+    </nav>
+    <h1>Search for a Student</h1>
+    <form onsubmit="searchStudent(event)">
+        <label for="studentName">Student Name:</label>
+        <input type="text" id="studentName" name="studentName" required>
+        <button type="submit">Search</button>
+    </form>
+
+    <h1>Add a Student</h1>
+    <form onsubmit="addStudent(event)">
+        <label for="addName">Name:</label>
+        <input type="text" id="addName" name="addName" required><br>
+        <label for="addId">ID:</label>
+        <input type="number" id="addId" name="addId" required><br>
+        <label for="addPhone">Phone:</label>
+        <input type="text" id="addPhone" name="addPhone" required><br>
+        <label for="addZip">Zip:</label>
+        <input type="text" id="addZip" name="addZip" required><br>
+        <button type="submit">Add Student</button>
+    </form>
+
+    <h2>Result:</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>ID</th>
+                <th>Phone</th>
+                <th>Zip</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="resultTable">
+            <!-- Results will be displayed here -->
+        </tbody>
+    </table>
+</body>
+</html>
