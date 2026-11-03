@@ -1,5 +1,9 @@
 # CIS 3339 Homework 1: Vue 3 and MongoDB Migration
 
+## Current implementation
+
+Phase 2 adds the local MongoDB backend. See [Phase 2 setup and API notes](docs/phase-2-review.md) for current run commands, configuration, and test instructions. The original assignment requirements remain below.
+
 ## Assignment Overview
 
 In this assignment, you will migrate the provided Student Management System into a modern full-stack enterprise application.

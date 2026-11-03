@@ -36,7 +36,7 @@ function add() {
 function remove(record) {
   if (!window.confirm(`Delete student ${record.name}?`)) return
   run(async () => {
-    await post('delete-student', { name: record.name })
+    await post('delete-student', { id: record.id })
     student.value = null
     notice.show('Student deleted successfully.')
   })
