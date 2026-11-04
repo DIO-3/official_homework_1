@@ -1,0 +1,15 @@
+{
+  "name": "cis3339-homework1",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "scripts": {
+    "postinstall": "npm ci --prefix backend && npm ci --prefix frontend",
+    "build": "npm run build --prefix frontend",
+    "start": "npm start --prefix backend",
+    "test": "npm run build && npm test --prefix frontend && npm test --prefix backend",
+    "dev": "npm run dev --prefix frontend"
+  }
+}

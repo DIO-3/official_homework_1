@@ -2,7 +2,21 @@
 
 ## Current implementation
 
-Phase 2 adds the local MongoDB backend. See [Phase 2 setup and API notes](docs/phase-2-review.md) for current run commands, configuration, and test instructions. The original assignment requirements remain below.
+The complete Vue interface and MongoDB backend now run together through Express. With Node.js 20.19+ (or 22.12+ for Node 22) and local MongoDB Community Edition running, run these commands from the repository root:
+
+```sh
+npm install
+npm run build
+npm start
+```
+
+Open **http://localhost:3000**. Students, Courses, and Enrollments can be refreshed directly at `/students`, `/courses`, and `/enrollments`. The frontend uses `/api` on this same server; Vite is only needed during development.
+
+`npm install` installs both subprojects using their committed lockfiles. For a clean locked installation, use `npm ci` at the root. `npm test` builds the frontend and runs frontend state tests plus backend integration and production tests. Backend tests use isolated temporary databases that they remove afterward; local MongoDB must be running.
+
+The tracked `backend/.env` supplies `MONGODB_URI=mongodb://127.0.0.1:27017/cis3339_homework1` and `PORT=3000`, with no secrets. Startup automatically creates the database collections and indexes; no database setup or seed command is needed. On this Mac, MongoDB can be started with `brew services start mongodb-community@8.0` if it is not already running.
+
+For development, start `npm start` in one terminal and `npm run dev` in another, then use http://127.0.0.1:5173. The [Phase 2 API notes](docs/phase-2-review.md) describe the API and data model; the production commands above supersede their earlier phase-specific deployment notes. The original assignment requirements remain below.
 
 ## Assignment Overview
 

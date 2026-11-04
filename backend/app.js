@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const path = require('path');
 const { Student, Course, Enrollment } = require('./models');
 const services = require('./services');
 const { httpError, requiredText } = require('./validation');
@@ -8,12 +9,11 @@ const { httpError, requiredText } = require('./validation');
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '16kb' }));
-app.use((req, res, next) => {
+const router = express.Router();
+router.use((req, res, next) => {
     if (mongoose.connection.readyState !== 1) return next(httpError(503, 'Database unavailable. Please try again shortly.'));
     next();
 });
-
-const router = express.Router();
 router.get('/health', (req, res) => res.json({ status: 'ok' }));
 
 router.get('/students', async (req, res) => {
@@ -67,8 +67,26 @@ router.post('/delete-student', async (req, res) => {
     res.json({ message: 'Student deleted successfully.', student });
 });
 
-app.use('/api', router);
-app.use('/', router);
+app.use('/api', router, (req, res) => res.status(404).json({ error: 'Endpoint not found.' }));
+app.use((req, res, next) => {
+    const legacyPaths = ['/find-student', '/add-student', '/delete-student'];
+    if (req.method === 'POST' && legacyPaths.includes(req.path)) return router(req, res, next);
+    next();
+});
+
+const frontendPath = path.join(__dirname, '../frontend/dist');
+app.use(express.static(frontendPath, { index: false, redirect: false }));
+// Let Vue handle its page routes after a refresh.
+app.get(['/', '/students', '/courses', '/enrollments'], (req, res, next) => {
+    res.set('Cache-Control', 'no-cache');
+    res.sendFile(path.join(frontendPath, 'index.html'), error => {
+        if (!error) return;
+        if (error.code === 'ENOENT') {
+            return res.status(503).json({ error: 'Frontend build missing. Run npm run build from the project root.' });
+        }
+        next(error);
+    });
+});
 app.use((req, res) => res.status(404).json({ error: 'Endpoint not found.' }));
 app.use((error, req, res, next) => {
     if (res.headersSent) return next(error);
