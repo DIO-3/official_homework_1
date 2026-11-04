@@ -69,7 +69,7 @@ The server listens on the local machine. Run one Express process for this applic
 - **Courses:** add a course ID and name, list courses, open a course's roster, or confirm course deletion.
 - **Enrollments:** choose an existing course and student from backend data, enroll the student, and view that course's roster. Use **Refresh records** to load changes made elsewhere.
 
-Required fields are trimmed and validated. Duplicate student IDs, course IDs, and student/course enrollment pairs are rejected. IDs are strings and case-sensitive. Deleting a student removes their enrollments; deleting a course removes its enrollments while preserving student records. Success, error, loading, and empty states appear in each view.
+Required fields are trimmed and validated. Duplicate student IDs, course IDs, and student/course enrollment pairs are rejected. IDs are strings and case-sensitive; `.` and `..` are rejected because browsers treat them as URL path navigation. Deleting a student removes their enrollments; deleting a course removes its enrollments while preserving student records. Success, error, loading, and empty states appear in each view.
 
 ## Testing and verification
 

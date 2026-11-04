@@ -127,7 +127,7 @@ describe('Phase 2 API with local MongoDB', { concurrency: false, timeout: 60000 
     assert.deepEqual(results.map(row => row.id), ['literal']);
   });
 
-  it('rejects incomplete or wrongly typed records', async () => {
+  it('rejects invalid records', async () => {
     for (const key of ['name', 'id', 'phone', 'zip']) {
       const value = student();
       delete value[key];
@@ -138,6 +138,12 @@ describe('Phase 2 API with local MongoDB', { concurrency: false, timeout: 60000 
     for (const key of ['name', 'id']) {
       await request('POST', '/api/courses', { ...course(), [key]: '' }, 400);
       await request('POST', '/api/courses', { ...course(), [key]: [] }, 400);
+    }
+    for (const id of ['.', '..', ' . ', ' .. ']) {
+      const studentError = await request('POST', '/api/students', student(id), 400);
+      assert.equal(studentError.error, 'Student ID cannot be "." or "..".');
+      const courseError = await request('POST', '/api/courses', course(id), 400);
+      assert.equal(courseError.error, 'Course ID cannot be "." or "..".');
     }
     await request('POST', '/api/students', null, 400);
     await request('POST', '/api/enrollments', {}, 400);

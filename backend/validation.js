@@ -11,17 +11,23 @@ function requiredText(value, field, maxLength = 200) {
     return result;
 }
 
+function recordId(value, field) {
+    const id = requiredText(value, field, 64);
+    if (id === '.' || id === '..') throw httpError(400, `${field} cannot be "." or "..".`);
+    return id;
+}
+
 function studentFields(body) {
     return {
         name: requiredText(body?.name, 'Name'),
-        id: requiredText(body?.id, 'Student ID', 64),
+        id: recordId(body?.id, 'Student ID'),
         phone: requiredText(body?.phone, 'Phone', 40),
         zip: requiredText(body?.zip, 'ZIP code', 20),
     };
 }
 
 function courseFields(body) {
-    return { id: requiredText(body?.id, 'Course ID', 64), name: requiredText(body?.name, 'Course name') };
+    return { id: recordId(body?.id, 'Course ID'), name: requiredText(body?.name, 'Course name') };
 }
 
 module.exports = { httpError, requiredText, studentFields, courseFields };
