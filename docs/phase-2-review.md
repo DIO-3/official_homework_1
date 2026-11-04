@@ -1,5 +1,7 @@
 # Phase 2 review
 
+Historical checkpoint for Phase 2, with the API reference retained below. The complete frontend and production hosting were finished in Phases 3 and 4; use the [README](../README.md) for current commands, and run the full test suite with `npm test` from the repository root.
+
 Phase 2 replaces the JSON database with local MongoDB and adds the complete student, course, and enrollment API. The Phase 1 student page still works. Full course and enrollment screens are part of Phase 3.
 
 ## Run locally

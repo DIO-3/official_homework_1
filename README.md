@@ -1,8 +1,37 @@
-# CIS 3339 Homework 1: Vue 3 and MongoDB Migration
+# CIS 3339 Homework 1 Student Management
 
-## Current implementation
+A student management application built with Vue 3 Composition API, Vue Router, Pinia, Express, and local MongoDB. It supports student search and management, course management, student enrollment, and course rosters. Express serves the compiled frontend and API together at **http://localhost:3000**.
 
-The complete Vue interface and MongoDB backend now run together through Express. With Node.js 20.19+ (or 22.12+ for Node 22) and local MongoDB Community Edition running, run these commands from the repository root:
+## Required software
+
+- **Node.js 20.19.x or later within Node 20, or Node.js 22.12.0 or newer**, with npm. This matches the installed Vite requirements; Node 21 and Node 22.0–22.11 are unsupported.
+- **MongoDB Community Edition**, running locally on port 27017; verified with MongoDB 8.0.32.
+- A modern browser and Git to clone this private repository.
+
+The verified environment used macOS, Node.js 26.8.2, npm 11.19.1, and MongoDB Community Edition 8.0.32. MongoDB Atlas, database credentials, and a replica set are not required.
+
+## Start local MongoDB
+
+Install MongoDB Community Edition for your operating system first, then start the database service. These commands start MongoDB itself; the application creates its own database, collections, and indexes automatically.
+
+| Installation | Start command | Official instructions |
+| --- | --- | --- |
+| macOS with Homebrew MongoDB 8.0 | `brew services start mongodb-community@8.0` | [macOS installation](https://www.mongodb.com/docs/v8.0/tutorial/install-mongodb-on-os-x/) |
+| Ubuntu with the official package and systemd | `sudo systemctl start mongod` | [Ubuntu installation](https://www.mongodb.com/docs/v8.0/tutorial/install-mongodb-on-ubuntu/) |
+| Windows installed as the default MongoDB service | `net start MongoDB` in an administrator terminal | [Windows service](https://www.mongodb.com/docs/manual/administration/run-mongodb-windows/) |
+
+Use the service name for your installed version if it differs. MongoDB must accept local connections at `127.0.0.1:27017`. MongoDB Compass and `mongosh` are optional inspection tools.
+
+## Install build and run
+
+Clone the repository using a GitHub account with access:
+
+```sh
+git clone https://github.com/DIO-3/official_homework_1.git
+cd official_homework_1
+```
+
+If you already have the project, open a terminal in its root directory, where the root `package.json` is located. With local MongoDB running, execute:
 
 ```sh
 npm install
@@ -10,13 +39,111 @@ npm run build
 npm start
 ```
 
-Open **http://localhost:3000**. Students, Courses, and Enrollments can be refreshed directly at `/students`, `/courses`, and `/enrollments`. The frontend uses `/api` on this same server; Vite is only needed during development.
+Open **http://localhost:3000**. The application redirects to `/students`; `/courses` and `/enrollments` also work when opened or refreshed directly. Stop the application with **Ctrl+C** in the server terminal. Restarting it with `npm start` preserves saved MongoDB records.
 
-`npm install` installs both subprojects using their committed lockfiles. For a clean locked installation, use `npm ci` at the root. `npm test` builds the frontend and runs frontend state tests plus backend integration and production tests. Backend tests use isolated temporary databases that they remove afterward; local MongoDB must be running.
+The root install command installs both subprojects using their committed lockfiles. For a clean locked installation, use `npm ci` instead of `npm install`. `npm run build` generates `frontend/dist`; `npm start` launches Express and serves those files. Rebuild after changing frontend source. Keep the server terminal running while using the application.
 
-The tracked `backend/.env` supplies `MONGODB_URI=mongodb://127.0.0.1:27017/cis3339_homework1` and `PORT=3000`, with no secrets. Startup automatically creates the database collections and indexes; no database setup or seed command is needed. On this Mac, MongoDB can be started with `brew services start mongodb-community@8.0` if it is not already running.
+No manual database creation, migration, seed, import, or rebuild command is needed. A new or empty assignment database works immediately after startup; no sample records are inserted automatically.
 
-For development, start `npm start` in one terminal and `npm run dev` in another, then use http://127.0.0.1:5173. The [Phase 2 API notes](docs/phase-2-review.md) describe the API and data model; the production commands above supersede their earlier phase-specific deployment notes. The original assignment requirements remain below.
+## Environment configuration
+
+The real [backend/.env](backend/.env) is intentionally tracked for this assignment:
+
+```dotenv
+MONGODB_URI=mongodb://127.0.0.1:27017/cis3339_homework1
+PORT=3000
+```
+
+| Variable | Purpose |
+| --- | --- |
+| `MONGODB_URI` | Required local MongoDB connection string; uses the `cis3339_homework1` database. |
+| `PORT` | Express port; the submitted value and application default are `3000`. |
+
+The server loads this file relative to `backend/server.js`, regardless of the terminal's working directory. Existing process environment variables take precedence, so clear old `MONGODB_URI` or `PORT` overrides when testing the submitted configuration. The file contains no passwords or cloud credentials. `.gitignore` permits this specific file while ignoring other `.env` files, dependencies, generated frontend assets, logs, and operating-system files.
+
+The server listens on the local machine. Run one Express process for this application and database.
+
+## Using the application
+
+- **Students:** add a name, student ID, phone number, and ZIP code; search the loaded directory by name or ID; view student details; and confirm a deletion when needed. Search is case-insensitive and supports partial matches.
+- **Courses:** add a course ID and name, list courses, open a course's roster, or confirm course deletion.
+- **Enrollments:** choose an existing course and student from backend data, enroll the student, and view that course's roster. Use **Refresh records** to load changes made elsewhere.
+
+Required fields are trimmed and validated. Duplicate student IDs, course IDs, and student/course enrollment pairs are rejected. IDs are strings and case-sensitive. Deleting a student removes their enrollments; deleting a course removes its enrollments while preserving student records. Success, error, loading, and empty states appear in each view.
+
+## Testing and verification
+
+With local MongoDB running, run this from the repository root:
+
+```sh
+npm test
+```
+
+This command builds the frontend, runs **12 frontend state/API tests**, and runs **18 backend integration/startup tests**. Backend tests create randomly named `cis3339_hw1_test_...` and `cis3339_hw1_startup_...` databases and delete only those temporary databases afterward. They do not reset the assignment database.
+
+The completed checks include:
+
+- Clean dependency installation using the exact tracked `.env` and an empty local assignment database.
+- Automatic initialization against a nonexistent database, including unique indexes.
+- Student and course operations, search, duplicate prevention, valid enrollment relationships, and course rosters.
+- Student/course cascading deletion, including simultaneous enrollment/deletion requests.
+- Data persistence after stopping and restarting the server process.
+- Production HTML, JavaScript, and CSS delivery; refreshes of all main routes; JSON errors for missing API endpoints and assets.
+- Browser testing of the production features, duplicate errors, deletion confirmations, and restart persistence, with no unexpected console or server errors observed.
+- Desktop and mobile frontend layout checks, labeled controls, keyboard focus, validation, and recovery from a stopped backend.
+
+Temporary browser-test records were removed after verification. The original assignment's detailed test scenarios and completed deliverables checklist are retained below.
+
+## Development commands
+
+For live frontend changes, run these commands in two terminals from the repository root:
+
+```sh
+npm start
+```
+
+```sh
+npm run dev
+```
+
+Open **http://127.0.0.1:5173** for development. Vite forwards `/api` requests to Express on port 3000. The production app at **http://localhost:3000** works without Vite. If you change the backend port for development, also adjust the target in `frontend/vite.config.js`.
+
+## Project structure
+
+| Location | Responsibility |
+| --- | --- |
+| `frontend/src/views/` | Student, course, and enrollment screens using the Composition API. |
+| `frontend/src/components/` | Shared form fields, student/roster table, notices, and confirmation dialog. |
+| `frontend/src/stores/` | Pinia catalog data, roster state, and notices. |
+| `frontend/src/router/` and `frontend/src/api/` | Navigation and HTTP requests. |
+| `backend/app.js` | REST routes, JSON errors, static assets, and frontend route delivery. |
+| `backend/models.js` and `backend/database.js` | Mongoose schemas, indexes, and automatic database initialization. |
+| `backend/services.js` and `backend/validation.js` | Validated mutations, relationship checks, and cascading deletion. |
+| `backend/server.js` and `backend/.env` | Startup, local configuration, and shutdown. |
+| `frontend/test/` and `backend/test/` | Frontend state tests and real MongoDB integration/production tests. |
+| `images/` | Original assignment reference images. |
+
+All application persistence uses MongoDB. Mongoose validates records, and MongoDB unique indexes reject duplicate IDs and enrollments. The backend orders mutations within its single server process so an enrollment cannot interleave with a parent deletion. This is the assignment's local deployment model; multiple backend processes writing to the same database are not supported by that coordination mechanism.
+
+The [Phase 2 API reference](docs/phase-2-review.md#api) describes request fields, endpoints, and status codes. Earlier phase notes are retained as historical context; use this README for current setup and deployment.
+
+## Troubleshooting
+
+| Symptom | Action |
+| --- | --- |
+| Server cannot connect to MongoDB | Start local MongoDB, check `backend/.env`, and clear unintended environment overrides. |
+| Port already in use | Stop the previous application process with Ctrl+C, or choose a different `PORT` and use its localhost URL. |
+| Frontend build missing or old interface displayed | Run `npm run build` from the root and refresh the browser. |
+| Dependencies missing or Node version unsupported | Use the required Node version, then run root `npm ci`. |
+| API error or stale lists | Check that the server is running and choose **Refresh records**; the UI displays validation and duplicate errors without losing entered form values. |
+| Tests cannot connect | Start MongoDB at `127.0.0.1:27017`; the automated tests use this local address independently of shell overrides. |
+
+## Submission contents
+
+The repository includes source code, lockfiles, tests, this README, and the real local `backend/.env`. It excludes `node_modules`, `frontend/dist`, `.DS_Store`, and logs. The grader builds production assets using the documented commands. All items in the assignment deliverables checklist below have been implemented and checked.
+
+<details>
+<summary>Original assignment requirements and completed checklist</summary>
 
 ## Assignment Overview
 
@@ -252,24 +379,24 @@ Vue Router navigation must work when users move between views, and refreshing a 
 
 Your repository must include:
 
-- [ ] A Vue 3 frontend implemented entirely with the Composition API
-- [ ] Vue Router navigation between the application's main views
-- [ ] Pinia stores for shared state used across components or views
-- [ ] Reusable Vue components for the required functionality
-- [ ] A responsive, accessible, and consistently styled user interface
-- [ ] Student add, search, display, and delete features
-- [ ] Course add, list, and delete features
-- [ ] Enrollment add and course-roster features
-- [ ] An Express REST API supporting all required frontend operations
-- [ ] MongoDB models/collections for students, courses, and enrollments
-- [ ] Automatic operation with an empty or nonexistent local MongoDB database, with no manual database preparation
-- [ ] Validation, duplicate prevention, and cascading enrollment deletion
-- [ ] Environment-based MongoDB configuration
-- [ ] The real `.env` file, configured for local MongoDB, committed to Git
-- [ ] A working `npm run build` command
-- [ ] A production server that serves the built application on `localhost`
-- [ ] Updated setup, build, and run instructions
-- [ ] Graceful error handling and no unexpected console errors
+- [x] A Vue 3 frontend implemented entirely with the Composition API
+- [x] Vue Router navigation between the application's main views
+- [x] Pinia stores for shared state used across components or views
+- [x] Reusable Vue components for the required functionality
+- [x] A responsive, accessible, and consistently styled user interface
+- [x] Student add, search, display, and delete features
+- [x] Course add, list, and delete features
+- [x] Enrollment add and course-roster features
+- [x] An Express REST API supporting all required frontend operations
+- [x] MongoDB models/collections for students, courses, and enrollments
+- [x] Automatic operation with an empty or nonexistent local MongoDB database, with no manual database preparation
+- [x] Validation, duplicate prevention, and cascading enrollment deletion
+- [x] Environment-based MongoDB configuration
+- [x] The real `.env` file, configured for local MongoDB, committed to Git
+- [x] A working `npm run build` command
+- [x] A production server that serves the built application on `localhost`
+- [x] Updated setup, build, and run instructions
+- [x] Graceful error handling and no unexpected console errors
 
 Do not submit:
 
@@ -341,3 +468,4 @@ Your work will be evaluated for:
 - required interface quality and accessibility; and
 - clear documentation and user experience.
 
+</details>

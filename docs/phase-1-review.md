@@ -1,5 +1,7 @@
 # Phase 1 review
 
+Historical checkpoint for Phase 1. The later phases completed the missing features and replaced the native delete popup; browser navigation and deletion were verified in Phases 3 and 4. Use the [README](../README.md) for the final application and current commands.
+
 ## Starter baseline
 
 Installed backend dependencies with `npm ci` and ran the original Express server on port 3000 before changing the frontend. API checks passed for searching the existing testuser, adding and finding a temporary student, deleting that student, returning 404 for a missing student, and returning 400 for missing required fields. Original student data was restored after testing.
